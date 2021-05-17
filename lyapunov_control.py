@@ -119,10 +119,10 @@ def lyapunov_controller_to_point(state, uref):
 	# unpack state and params
 	xb1, xb2, xb3 = state
 	u1 = uref - (2.*xb2+np.sin(xb3))
-	if u1 > 0.5:
-		u1 = 0.5
-	if u1 < -0.5:
-		u1 = -0.5
+	if u1 > 0.75:
+		u1 = 0.75
+	if u1 < -0.75:
+		u1 = -0.75
 
 	return u1
 
