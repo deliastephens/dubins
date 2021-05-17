@@ -13,3 +13,8 @@ export PYTHONPATH=`pwd`:${PYTHONPATH}
 ```
 
 Also need to install `numpy` and `matplotlib`
+
+After installation in the virtualenv,
+```
+source venv/bin/activate
+```

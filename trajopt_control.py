@@ -14,6 +14,8 @@ from pydrake.systems.framework import (BasicVector, BasicVector_, LeafSystem_,
 import pydrake.symbolic as sym
 
 from visualization import *
+from pydrake.solvers.ipopt import IpoptSolver
+
 
 
 """
@@ -37,7 +39,7 @@ def dubins_continuous_dynamics(x, u):
 
 def dubins_discrete_dynamics(x, x_next, u, time_step):
 	'''
-	Residuals of the Dubins discre-time dynamics
+	Residuals of the Dubins discrete-time dynamics
 	If the vector of residuals is zero, then this method's arguments verify the
 	discrete time dynamics.
 	Uses an implict Euler formulation.
@@ -79,7 +81,7 @@ def constraint_state_to_orbit(x, x_next, xf, r, time_step):
 	If the vector of residuals is zero, then the state of the Dubins car is
 	"orbiting" around the given final position.
 
-	Calculates these residuals by confirming theere is zero radial velocity,
+	Calculates these residuals by confirming there is zero radial velocity,
 	and the final position is r away from the desired orbit position.
 	'''
 	# unpack state, rocket position in relative coordinates
@@ -133,12 +135,15 @@ def trajopt_simulation(x0, xf, u_max=0.5):
 		prog.AddConstraint(-u_max <= u[t][0])
 
 		# cost - increases cost if off the orbit
-		x = state[t][0]
-		y = state[t][1]
-		prog.AddCost((x-xf[0])**2 + (y-xf[1])**2 - (1/u_max)**2)
+		p = state[t][:2]
+		v = (state[t+1][:2] - state[t][:2]) / time_interval
+		prog.AddCost(time_interval)
+		prog.AddCost(p.dot(v)*time_interval)
+		prog.AddCost((p.dot(p) + (1/u_max) ** 2)*time_interval)
 
 
-	# initial guess
+
+	# # initial guess
 	state_guess = interpolate_dubins_state(
 		np.array([0, 0, np.pi]),
 		xf,
@@ -157,6 +162,4 @@ def trajopt_simulation(x0, xf, u_max=0.5):
 	u_opt = result.GetSolution(u).T
 	state_opt = result.GetSolution(state).T
 
-	draw_simulation(state_opt)
-
-	return u_opt, state_opt
+	return state_opt, u_opt

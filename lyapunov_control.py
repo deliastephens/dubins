@@ -63,10 +63,16 @@ class LyapunovController(VectorSystem):
 		VectorSystem.__init__(self, 3, 1)
 		self.lyapunov_controller = lyapunov_controller
 
-		# problem parameters (TODO: make changeable)
-		self.params = params # a, u_max, eps
+
+
+		if not isinstance(params, np.float64):
+			self.params = params # a, u_max, eps
+			self.r = 1/self.params[1]
+		else:
+			self.params = params
+			self.r = 0
 		self.fx1, self.fx2, self.fx3 = final_state
-		self.r = 1/self.params[1]
+		
 
 	def DoCalcVectorOutput(
 		self, 
@@ -79,13 +85,14 @@ class LyapunovController(VectorSystem):
 		x1, x2, x3 = cartesian_state
 		ex1 = x1 - self.fx1
 		ex2 = x2 - self.fx2
+		ex3 = x3 - self.fx3
 
 		# augmented states
 		xb1 = ex1*np.cos(x3) + ex2*np.sin(x3)
 		xb2 = -ex1*np.sin(x3) + ex2*np.cos(x3) + self.r
-		xb3 = xb2 - x3
+		xb3 = xb2 - ex3
 		state = np.array([xb1, xb2, xb3])
-		input[:] = self.lyapunov_controller(state, self.params )
+		input[:] = self.lyapunov_controller(state, self.params)
 
 def lyapunov_controller(state, params):
 	'''
@@ -108,10 +115,23 @@ def lyapunov_controller(state, params):
 
 	return u1
 
+def lyapunov_controller_to_point(state, uref):
+	# unpack state and params
+	xb1, xb2, xb3 = state
+	u1 = uref - (2.*xb2+np.sin(xb3))
+	if u1 > 0.5:
+		u1 = 0.5
+	if u1 < -0.5:
+		u1 = -0.5
+
+	return u1
+
 def lyapunov_simulation(
  	x0,
  	xf, 
+ 	uref=0,
 	create_dynamics=create_symbolic_dynamics, 
+	to_point=False,
 	a=0.1, 
 	u_max=0.5, 
 	eps=2.):
@@ -121,6 +141,7 @@ def lyapunov_simulation(
 	Parameters:
 	x0: initial state (x, y, yaw)
 	x1: final state (x, y, yaw)
+	uref: reference input
 	create_dynamics: symbolic dynamics creation function
 	a, eps: lyapunov controller parameters
 	u_max: control limit (u_max = 1/r)
@@ -137,7 +158,10 @@ def lyapunov_simulation(
 	uav = builder.AddSystem(uavPlant)
 
 	# add the controller
-	controller = builder.AddSystem(LyapunovController(lyapunov_controller, params, xf))
+	if not to_point:
+		controller = builder.AddSystem(LyapunovController(lyapunov_controller, params, xf))
+	else:
+		controller = builder.AddSystem(LyapunovController(lyapunov_controller_to_point, uref, xf))
 
 	# wire the controller with the system
 	builder.Connect(uavPlant.get_output_port(0), controller.get_input_port(0))
@@ -164,7 +188,14 @@ def lyapunov_simulation(
 
 	# simulate from zero to sim_time
 	# the trajectory will be stored in the logger
-	sim_time = 200.
+	if not to_point:
+		sim_time = 400
+	else:
+		sim_time = 0.1
 	simulator.AdvanceTo(sim_time)
+	# print('done!')
 
-	draw_simulation(logger.data())
+
+	# draw_simulation(logger.data())
+
+	return (simulator, logger.data())
