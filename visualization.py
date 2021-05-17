@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import numpy as np
 def draw_simulation(data, xf, r):
   '''
   Creates a plot for the UAV Trajectory.
@@ -21,10 +22,14 @@ def draw_simulation(data, xf, r):
   plt.title('UAV Circling Trajectory');
 
 def draw_comparison(opt_data, lyap_data):
+  """
+  Lyap Data: np array of multiple trajectory optimizations
+  """
   plt.figure(figsize=(10,10))
-
-  plt.plot(opt_data[0,:], opt_data[1,:], 'b')
-  plt.plot(lyap_data[0,:], lyap_data[1,:], 'r')
+  plt.plot(opt_data[0,:], opt_data[1,:], 'b', linewidth=1.75)
+  for x_traj in lyap_data:
+    x_traj[ x_traj==0 ] = np.nan
+    plt.plot(x_traj[0,:], x_traj[1,:])
 
   # misc plot settings
   plt.gca().set_aspect('equal')
