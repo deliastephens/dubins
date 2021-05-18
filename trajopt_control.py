@@ -14,6 +14,7 @@ from pydrake.systems.framework import (BasicVector, BasicVector_, LeafSystem_,
 import pydrake.symbolic as sym
 
 from visualization import *
+from lyapunov_control import *
 from pydrake.solvers.ipopt import IpoptSolver
 
 
@@ -53,7 +54,7 @@ def dubins_discrete_dynamics(x, x_next, u, time_step):
  ###
 # Trajectory optimization helper functions
 ###
-def interpolate_dubins_state(x0, xf, time_steps, time_interval):
+def interpolate_dubins_state(x0, xf, time_steps, time_interval, r):
 	'''
 	Creates an initial guess for the state by drawing a straight line between
 	the initial and final positions
@@ -62,7 +63,7 @@ def interpolate_dubins_state(x0, xf, time_steps, time_interval):
 
 	# initial and final time and state
 	time_limits = [0., time_steps * time_interval]
-	position_limits = np.column_stack((x0, xf))
+	position_limits = np.column_stack((x0, xf + np.array([0, r, -np.pi/2.]))) # set final position to be the top of the circle
 	state_limits = position_limits
 
 	# linear interpolation in state
@@ -72,7 +73,7 @@ def interpolate_dubins_state(x0, xf, time_steps, time_interval):
 	state_guess = np.vstack([state.value(t * time_interval).T for t in range(time_steps + 1)])
 	state_guess += np.random.rand(*state_guess.shape) * 5e-6
 
-	print(np.shape(state_guess))
+	# print(np.shape(state_guess))
 
 	return state_guess
 
@@ -138,8 +139,9 @@ def trajopt_simulation(x0, xf, u_max=0.5):
 		p = state[t][:2]
 		v = (state[t+1][:2] - state[t][:2]) / time_interval
 		prog.AddCost(time_interval)
-		prog.AddCost(p.dot(v)*time_interval)
-		prog.AddCost((p.dot(p) + (1/u_max) ** 2)*time_interval)
+		# prog.AddCost(u[t][0]*u[t][0]*time_interval)
+		# prog.AddCost(p.dot(v)*time_interval)
+		prog.AddCost((p.dot(p) + (1/u_max) ** 2))
 
 
 
@@ -148,7 +150,8 @@ def trajopt_simulation(x0, xf, u_max=0.5):
 		np.array([0, 0, np.pi]),
 		xf,
 		time_steps, 
-		time_interval
+		time_interval,
+		1/u_max
 		)
 
 	prog.SetInitialGuess(state, state_guess)
@@ -163,3 +166,4 @@ def trajopt_simulation(x0, xf, u_max=0.5):
 	state_opt = result.GetSolution(state).T
 
 	return state_opt, u_opt
+

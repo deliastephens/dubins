@@ -16,9 +16,7 @@ import pydrake.all
 from pydrake.common.containers import namedview
 from pydrake.systems.scalar_conversion import TemplateSystem
 from pydrake.all import (Variable, SymbolicVectorSystem, VectorSystem, DiagramBuilder,
-                         LogOutput, Simulator, ConstantVectorSource,
-                         MathematicalProgram, Solve, SnoptSolver, PiecewisePolynomial, eq, cos, sin, 
-                         DirectTranscription, DirectCollocation)
+                         LogOutput, Simulator, sin, cos)
 from pydrake.systems.framework import (BasicVector, BasicVector_, LeafSystem_,
                                        LeafSystem)
 import pydrake.symbolic as sym
@@ -119,10 +117,10 @@ def lyapunov_controller_to_point(state, uref):
 	# unpack state and params
 	xb1, xb2, xb3 = state
 	u1 = uref - (2.*xb2+np.sin(xb3))
-	if u1 > 0.75:
-		u1 = 0.75
-	if u1 < -0.75:
-		u1 = -0.75
+	if u1 > 0.6:
+		u1 = 0.6
+	if u1 < -0.6:
+		u1 = -0.6
 
 	return u1
 
@@ -170,6 +168,7 @@ def lyapunov_simulation(
 	# add a logger to the diagram
 	# this will store the state trajectory
 	logger = LogOutput(uavPlant.get_output_port(0), builder)
+	control_logger = LogOutput(controller.get_output_port(0), builder)
 
 	# complete the construction of the diagram
 	diagram = builder.Build()
@@ -180,6 +179,7 @@ def lyapunov_simulation(
 
 	# set up a simulation environment
 	simulator = Simulator(diagram)
+	# simulator.set_target_realtime_rate(1)
 
 	# set the initial cartesian state to a random initial position
 	# try initial_state = np.random.randn(3) for a random initial state
@@ -198,4 +198,4 @@ def lyapunov_simulation(
 
 	# draw_simulation(logger.data())
 
-	return (simulator, logger.data())
+	return (simulator, logger.data(), control_logger.data())
