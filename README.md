@@ -2,7 +2,7 @@
 
 Dubins is a library for control of a highly-constrained Dubins vehicle as implemented in [Pydrake](https://drake.mit.edu/), a Python model-based design and verification tool for robots. This is my final project for the MIT course [6.832: Underactuated Robotics](http://underactuated.csail.mit.edu/Spring2021/). To complete this project, I combined the notion of a [control-Lyapunov Function](https://en.wikipedia.org/wiki/Control-Lyapunov_function) and [trajectory optimization](http://underactuated.csail.mit.edu/trajopt.html) to control the long-term behavior of a highly constrained system in the presence of trajectory disturbances.
 
-My implementation, while not perfect, marks a drastic improvement over the optimal controller when trajectory disturbances are present. For more information and analysis, please read my term paper.
+My implementation, while not perfect, marks a drastic improvement over the optimal controller when trajectory disturbances are present. For more information and analysis, please read my [term paper](https://github.com/deliastephens/dubins/blob/main/6_832_Final_Report.pdf).
 
 The repository contains:
 
