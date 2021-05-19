@@ -63,7 +63,7 @@ def interpolate_dubins_state(x0, xf, time_steps, time_interval, r):
 
 	# initial and final time and state
 	time_limits = [0., time_steps * time_interval]
-	position_limits = np.column_stack((x0, xf + np.array([0, r, -np.pi/2.]))) # set final position to be the top of the circle
+	position_limits = np.column_stack((x0, xf + np.array([0, r, -np.pi]))) # set final position to be the top of the circle
 	state_limits = position_limits
 
 	# linear interpolation in state
@@ -71,7 +71,7 @@ def interpolate_dubins_state(x0, xf, time_steps, time_interval, r):
 
 	# sample state on the time grid and add small random noise
 	state_guess = np.vstack([state.value(t * time_interval).T for t in range(time_steps + 1)])
-	state_guess += np.random.rand(*state_guess.shape) * 5e-6
+	state_guess += np.random.rand(*state_guess.shape) * 9e-1
 
 	# print(np.shape(state_guess))
 
@@ -87,15 +87,15 @@ def constraint_state_to_orbit(x, x_next, xf, r, time_step):
 	'''
 	# unpack state, rocket position in relative coordinates
 	p = x[:2] - xf[:2]
-	v = (x_next[:2] - x[:2]) / time_step
+	# v = (x_next[:2] - x[:2]) / time_step
 
 	# constraint on radial distance
 	# sets x^2 + y^2 to the orbit radius squared
-	residual_p = p.dot(p) - r ** 2
+	residual_p = p.dot(p) - r**2
 
 	# radial velocity must be zero
 	# sets the time derivative of x^2 + y^2 to zero
-	residual_v = p.dot(v)
+	# residual_v = p.dot(v)
 
 	# gather constraint residuals
 	residuals = np.array([residual_p])
@@ -119,8 +119,8 @@ def trajopt_simulation(x0, xf, u_max=0.5):
 	u = prog.NewContinuousVariables(time_steps, 1, 'u')
 
 	# final position constraint
-	for residual in constraint_state_to_orbit(state[-2], state[-1], xf, 1/u_max, time_interval):
-		prog.AddConstraint(residual == 0)
+	# for residual in constraint_state_to_orbit(state[-2], state[-1], xf, 1/u_max, time_interval):
+	# 	prog.AddConstraint(residual == 0)
 
 	# initial position constraint
 	prog.AddConstraint(eq(state[0],x0))
@@ -136,12 +136,16 @@ def trajopt_simulation(x0, xf, u_max=0.5):
 		prog.AddConstraint(-u_max <= u[t][0])
 
 		# cost - increases cost if off the orbit
-		p = state[t][:2]
+		p = state[t][:2] - xf[:2]
 		v = (state[t+1][:2] - state[t][:2]) / time_interval
-		prog.AddCost(time_interval)
+		# prog.AddCost(time_interval)
 		# prog.AddCost(u[t][0]*u[t][0]*time_interval)
 		# prog.AddCost(p.dot(v)*time_interval)
-		prog.AddCost((p.dot(p) + (1/u_max) ** 2))
+		for residual in constraint_state_to_orbit(state[t], state[t+1], xf, 1/u_max, time_interval):
+			# prog.AddConstraint(residual >= 0)
+			prog.AddQuadraticCost(residual)
+		# prog.AddCost((p.dot(p)))
+
 
 
 
