@@ -61,7 +61,7 @@ If you change any of the files, you must restart the kernel.
 
 \[1\]  T. Maillot,  U. Boscain, J.-P. Gauthier, and U. Serres, “Lyapunov and minimum-time path planning for drones,” Jul. 2013. \[Online\]. Available:https://hal.archives-ouvertes.fr/hal-00847812
 
-\[2\]  B.Paden, M. Cap, S.Z. Yong, D. Yershov, and E. Frazzoli, “A Survey of Motion Planning and Control  Techniques for Self-driving Urban Vehicles, ”arXiv:1604.07446 [cs], Apr. 2016, arXiv: 1604.07446. \[Online\]. Available: http://arxiv.org/abs/1604.07446
+\[2\]  B. Paden, M. Cap, S.Z. Yong, D. Yershov, and E. Frazzoli, “A Survey of Motion Planning and Control  Techniques for Self-driving Urban Vehicles, ”arXiv:1604.07446 [cs], Apr. 2016, arXiv: 1604.07446. \[Online\]. Available: http://arxiv.org/abs/1604.07446
 
 \[3\] Russ Tedrake. Underactuated Robotics: Algorithms for Walking, Running, Swimming, Flying, and Manipulation (Course Notes for MIT 6.832). Downloaded on 19 May 2021 from http://underactuated.mit.edu/
 
