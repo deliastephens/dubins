@@ -2,14 +2,15 @@
 
 Dubins is a library for control of a highly-constrained Dubins vehicle, whose state is described by the following dynamics. 
 
-$f(x)$
-
 The repository contains:
 
 1. Lyapunov Control - functions for applying a Control Lyapunov Function (CLF) to our system.
 2. Trajectory Optimization - functions for creating a PyDrake `MathematicalProgram` that navigates the Dubins vehicle to a desired start and end state.
 3. mCLF - a custom algorithm for robust trajectory optimization, combining the concepts of a CLF with trajectory optimization to control the systme in the presence of disturbances.
 4. Miscellaneous visualization tools, which were useful in writing my final report.
+
+{% include figures/lyapunov_controller.html %}
+
 
 # Use
 Explore the `demo.ipynb` Jupyter notebook for examples (and visualizations) of how this code can work!
