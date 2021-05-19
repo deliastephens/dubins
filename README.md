@@ -1,6 +1,8 @@
 # About
 
-Dubins is a library for control of a highly-constrained Dubins vehicle, whose state is described by the following dynamics. 
+Dubins is a library for control of a highly-constrained Dubins vehicle as implemented in [Pydrake](https://drake.mit.edu/), a Python model-based design and verification tool for robots. This is my final project for the MIT course [6.832: Underactuated Robotics](http://underactuated.csail.mit.edu/Spring2021/). To complete this project, I combined the notion of a [control-Lyapunov Function](https://en.wikipedia.org/wiki/Control-Lyapunov_function) and [trajectory optimization](http://underactuated.csail.mit.edu/trajopt.html) to control the long-term behavior of a highly constrained system in the presence of trajectory disturbances.
+
+My implementation, while not perfect, marks a drastic improvement over the optimal controller when trajectory disturbances are present. For more information and analysis, please read my term paper.
 
 The repository contains:
 
@@ -10,13 +12,20 @@ The repository contains:
 4. Miscellaneous visualization tools, which were useful in writing my final report.
 
 
-![lyapunov controller](figures/lyapunov_controller.gif)
-
 # Use
 Explore the `demo.ipynb` Jupyter notebook for examples (and visualizations) of how this code can work!
 
 ## Miscellaneous Warnings
 This code is not entirely finished. It was completed for a term project; many variables are hard-coded into my code, and the function library is not entirely clear. If you want to modify this library, please do so! I welcome any and all contributions.
+
+## Lyapunov Controller
+![lyapunov controller](figures/lyapunov_controller.gif)
+
+## Optimal Controller
+![optimal controller](figures/optimal_controller.gif)
+
+## Robust Controller
+![robust controller](figures/robust_controller.gif)
 
 # Installation Guide
 First, clone this repository.
@@ -47,4 +56,12 @@ jupyter notebook
 ```
 
 If you change any of the files, you must restart the kernel.
+
+# References
+
+\[1\]  T. Maillot,  U. Boscain, J.-P. Gauthier, and U. Serres, “Lyapunov and minimum-time path planning for drones,” Jul. 2013. \[Online\]. Available:https://hal.archives-ouvertes.fr/hal-00847812
+
+\[2\]  B.Paden, M. Cap, S.Z. Yong, D. Yershov, and E. Frazzoli, “A Survey of Motion Planning and Control  Techniques for Self-driving Urban Vehicles, ”arXiv:1604.07446 [cs], Apr. 2016, arXiv: 1604.07446. \[Online\]. Available: http://arxiv.org/abs/1604.07446
+
+\[3\] Russ Tedrake. Underactuated Robotics: Algorithms for Walking, Running, Swimming, Flying, and Manipulation (Course Notes for MIT 6.832). Downloaded on 19 May 2021 from http://underactuated.mit.edu/
 
