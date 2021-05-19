@@ -9,7 +9,7 @@ The repository contains:
 3. mCLF - a custom algorithm for robust trajectory optimization, combining the concepts of a CLF with trajectory optimization to control the systme in the presence of disturbances.
 4. Miscellaneous visualization tools, which were useful in writing my final report.
 
-{% include figures/lyapunov_controller.html %}
+{% include_relative figures/lyapunov_controller.html %}
 
 
 # Use
